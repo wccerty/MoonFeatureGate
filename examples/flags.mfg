@@ -1,0 +1,4 @@
+# MoonFeatureGate sample configuration
+flag new_checkout bool true rollout 2500
+flag beta_banner bool true target plan beta
+flag kill_switch bool false
