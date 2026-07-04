@@ -1,0 +1,67 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Lyhdsba/moonfeaturegate"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn bool_value(Bool) -> FlagValue
+
+pub fn context(String) -> EvalContext
+
+pub fn demo_output() -> String
+
+pub fn double_value(Double) -> FlagValue
+
+pub fn empty_provider() -> Provider
+
+pub fn evaluate_bool(Provider, String, EvalContext, default~ : Bool) -> BoolEvaluation
+
+pub fn int_value(Int) -> FlagValue
+
+pub fn parse_provider(String) -> Provider raise ParseError
+
+pub fn rollout_bucket(String, String) -> Int
+
+pub fn string_value(String) -> FlagValue
+
+// Errors
+pub(all) suberror ParseError {
+  InvalidLine(line~ : Int, text~ : String)
+} derive(Eq, @debug.Debug)
+
+// Types and methods
+pub(all) struct BoolEvaluation {
+  flag_key : String
+  value : Bool
+  reason : String
+} derive(Eq, @debug.Debug)
+
+pub(all) struct EvalContext {
+  targeting_key : String
+  attributes : Map[String, FlagValue]
+} derive(@debug.Debug)
+pub fn EvalContext::with_attr(Self, String, FlagValue) -> Self
+
+type FlagDefinition derive(@debug.Debug)
+
+pub(all) enum FlagValue {
+  BoolValue(Bool)
+  StringValue(String)
+  IntValue(Int)
+  DoubleValue(Double)
+} derive(Eq, @debug.Debug)
+pub fn FlagValue::to_text(Self) -> String
+
+pub struct Provider {
+  flags : Map[String, FlagDefinition]
+} derive(@debug.Debug)
+pub fn Provider::with_bool(Self, String, Bool, enabled? : Bool) -> Self
+pub fn Provider::with_bool_rollout(Self, String, Bool, percentage~ : Int, enabled? : Bool) -> Self
+pub fn Provider::with_bool_target(Self, String, Bool, attr~ : String, equals~ : FlagValue, enabled? : Bool) -> Self
+
+// Type aliases
+
+// Traits
+

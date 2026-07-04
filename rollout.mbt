@@ -14,7 +14,7 @@ pub fn rollout_bucket(flag_key : String, targeting_key : String) -> Int {
   let source = flag_key + ":" + targeting_key
   let mut acc = 5381
   for char in source {
-    acc = ((acc * 33) + char.to_int()) % 10000
+    acc = (acc * 33 + char.to_int()) % 10000
   }
   acc
 }

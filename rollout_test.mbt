@@ -20,8 +20,18 @@ test "percentage rollout respects closed boundaries" {
     true,
     percentage=10000,
   )
-  let off_detail = @moonfeaturegate.evaluate_bool(off, "new_checkout", ctx, default=false)
-  let on_detail = @moonfeaturegate.evaluate_bool(on, "new_checkout", ctx, default=false)
+  let off_detail = @moonfeaturegate.evaluate_bool(
+    off,
+    "new_checkout",
+    ctx,
+    default=false,
+  )
+  let on_detail = @moonfeaturegate.evaluate_bool(
+    on,
+    "new_checkout",
+    ctx,
+    default=false,
+  )
   assert_false(off_detail.value)
   inspect(off_detail.reason, content="rollout_miss")
   assert_true(on_detail.value)

@@ -51,15 +51,11 @@ fn parse_non_negative_int(text : String) -> Int? {
 fn parse_line(
   provider : Provider,
   line_no : Int,
-  text : String
+  text : String,
 ) -> Provider raise ParseError {
   let parts = text.split(" ").to_array()
-  guard token(parts, 0) is Some("flag") else {
-    raise_invalid(line_no, text)
-  }
-  guard token(parts, 2) is Some("bool") else {
-    raise_invalid(line_no, text)
-  }
+  guard token(parts, 0) is Some("flag") else { raise_invalid(line_no, text) }
+  guard token(parts, 2) is Some("bool") else { raise_invalid(line_no, text) }
   let key = match token(parts, 1) {
     Some(value) => value
     None => raise_invalid(line_no, text)
@@ -73,7 +69,8 @@ fn parse_line(
     6 =>
       if token(parts, 4) is Some("rollout") {
         match token(parts, 5).bind(parse_non_negative_int) {
-          Some(pct) => provider.with_bool_rollout(key, bool_value, percentage=pct)
+          Some(pct) =>
+            provider.with_bool_rollout(key, bool_value, percentage=pct)
           None => raise_invalid(line_no, text)
         }
       } else {
@@ -83,7 +80,12 @@ fn parse_line(
       if token(parts, 4) is Some("target") {
         let attr = token(parts, 5).unwrap()
         let expected = token(parts, 6).unwrap()
-        provider.with_bool_target(key, bool_value, attr~, equals=StringValue(expected))
+        provider.with_bool_target(
+          key,
+          bool_value,
+          attr~,
+          equals=StringValue(expected),
+        )
       } else {
         raise_invalid(line_no, text)
       }

@@ -19,6 +19,12 @@ repository = "https://github.com/Lyhdsba/MoonFeatureGate"
 
 license = "Apache-2.0"
 
-keywords = ["feature-flags", "rollout", "configuration", "moonbit", "osc-2026"]
+keywords = [
+  "feature-flags",
+  "rollout",
+  "configuration",
+  "moonbit",
+  "osc-2026",
+]
 
 description = "MoonBit-native feature flag evaluation, targeting, rollout, and explanation toolkit."

@@ -13,7 +13,7 @@ pub fn context(targeting_key : String) -> EvalContext {
 pub fn EvalContext::with_attr(
   self : EvalContext,
   key : String,
-  value : FlagValue
+  value : FlagValue,
 ) -> EvalContext {
   let next = self.attributes.copy()
   next[key] = value

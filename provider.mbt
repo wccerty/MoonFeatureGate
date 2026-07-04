@@ -30,13 +30,13 @@ pub fn Provider::with_bool(
   self : Provider,
   key : String,
   value : Bool,
-  enabled? : Bool = true
+  enabled? : Bool = true,
 ) -> Provider {
   let next = self.flags.copy()
   next[key] = {
     key,
     value: BoolValue(value),
-    enabled: enabled,
+    enabled,
     rollout_percentage: None,
     target_attr: None,
     target_value: None,
@@ -50,13 +50,13 @@ pub fn Provider::with_bool_rollout(
   key : String,
   value : Bool,
   percentage~ : Int,
-  enabled? : Bool = true
+  enabled? : Bool = true,
 ) -> Provider {
   let next = self.flags.copy()
   next[key] = {
     key,
     value: BoolValue(value),
-    enabled: enabled,
+    enabled,
     rollout_percentage: Some(clamp_percentage(percentage)),
     target_attr: None,
     target_value: None,
@@ -71,13 +71,13 @@ pub fn Provider::with_bool_target(
   value : Bool,
   attr~ : String,
   equals~ : FlagValue,
-  enabled? : Bool = true
+  enabled? : Bool = true,
 ) -> Provider {
   let next = self.flags.copy()
   next[key] = {
     key,
     value: BoolValue(value),
-    enabled: enabled,
+    enabled,
     rollout_percentage: None,
     target_attr: Some(attr),
     target_value: Some(equals),
@@ -102,7 +102,7 @@ pub fn evaluate_bool(
   provider : Provider,
   flag_key : String,
   ctx : EvalContext,
-  default~ : Bool
+  default~ : Bool,
 ) -> BoolEvaluation {
   ignore(ctx)
   match provider.flags.get(flag_key) {
@@ -123,7 +123,8 @@ pub fn evaluate_bool(
                 }
               None =>
                 match (flag.target_attr, flag.target_value) {
-                  (Some(_), Some(_)) => { flag_key, value, reason: "target_match" }
+                  (Some(_), Some(_)) =>
+                    { flag_key, value, reason: "target_match" }
                   _ => { flag_key, value, reason: "static" }
                 }
             }

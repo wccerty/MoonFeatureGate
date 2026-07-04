@@ -10,7 +10,12 @@ test "attribute targeting can match a selected audience" {
     attr="plan",
     equals=@moonfeaturegate.string_value("beta"),
   )
-  let detail = @moonfeaturegate.evaluate_bool(provider, "beta_banner", ctx, default=false)
+  let detail = @moonfeaturegate.evaluate_bool(
+    provider,
+    "beta_banner",
+    ctx,
+    default=false,
+  )
   assert_true(detail.value)
   inspect(detail.reason, content="target_match")
 }
@@ -27,7 +32,12 @@ test "attribute targeting falls back when the audience does not match" {
     attr="plan",
     equals=@moonfeaturegate.string_value("beta"),
   )
-  let detail = @moonfeaturegate.evaluate_bool(provider, "beta_banner", ctx, default=false)
+  let detail = @moonfeaturegate.evaluate_bool(
+    provider,
+    "beta_banner",
+    ctx,
+    default=false,
+  )
   assert_false(detail.value)
   inspect(detail.reason, content="target_miss")
 }

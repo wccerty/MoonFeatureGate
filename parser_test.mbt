@@ -16,7 +16,12 @@ test "text config parses static and rollout flags" {
     ctx,
     default=false,
   )
-  let banner = @moonfeaturegate.evaluate_bool(provider, "beta_banner", ctx, default=false)
+  let banner = @moonfeaturegate.evaluate_bool(
+    provider,
+    "beta_banner",
+    ctx,
+    default=false,
+  )
   assert_true(checkout.value)
   inspect(checkout.reason, content="rollout_match")
   assert_true(banner.value)
