@@ -47,3 +47,16 @@ gh auth refresh -h github.com
 
 GitLink push should be done after the user provides credentials or an access
 token for the target account.
+
+## Mooncakes Dry Run
+
+`moon publish --dry-run` completed local package validation and checked the
+extracted package successfully. The final server step returned:
+
+```text
+403 Forbidden: User mismatch. Module config uses Lyhdsba, authenticated user is caassien.
+```
+
+Resolution: publish with Mooncakes credentials for `Lyhdsba`, or change
+`moon.mod` only if the competition account and repository owner are intentionally
+different.
