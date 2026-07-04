@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from reportlab import rl_config
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
@@ -28,6 +29,7 @@ def p(text: str, style: ParagraphStyle) -> Paragraph:
 
 
 def main() -> None:
+    rl_config.invariant = 1
     regular, bold = register_fonts()
     OUT.parent.mkdir(parents=True, exist_ok=True)
 
