@@ -14,8 +14,8 @@ moon run cmd/moonfeaturegate
 
 ## Repository Requirements
 
-- Public GitHub repository: `https://github.com/Lyhdsba/MoonFeatureGate`
-- GitLink repository: create the same project name and keep it synchronized.
+- Public GitHub repository: `https://github.com/wccerty/MoonFeatureGate`
+- GitLink repository: `https://gitlink.org.cn/Wccerty/MoonFeatureGate`
 - License: Apache-2.0.
 - README is a regular file, not a symlink.
 - Commit history should contain 10-20 meaningful commits before submission.
@@ -38,15 +38,8 @@ management rather than those areas.
 
 ## Current Remote Prerequisites
 
-GitHub CLI authentication was invalid before implementation. Refresh locally
-with:
-
-```powershell
-gh auth refresh -h github.com
-```
-
-GitLink push should be done after the user provides credentials or an access
-token for the target account.
+GitHub and GitLink remotes should both point to the Wccerty/wccerty-owned
+submission repositories before final upload.
 
 ## Mooncakes Dry Run
 
@@ -54,9 +47,9 @@ token for the target account.
 extracted package successfully. The final server step returned:
 
 ```text
-403 Forbidden: User mismatch. Module config uses Lyhdsba, authenticated user is caassien.
+403 Forbidden: User mismatch between the module owner and the authenticated Mooncakes account.
 ```
 
-Resolution: publish with Mooncakes credentials for `Lyhdsba`, or change
+Resolution: publish with Mooncakes credentials for `Wccerty`, or change
 `moon.mod` only if the competition account and repository owner are intentionally
 different.

@@ -86,8 +86,8 @@ def main() -> None:
     story = [
         p("MoonFeatureGate：MoonBit 原生特性开关与灰度发布工具库", title),
         p(
-            "项目方向：工程基础设施与工具链 / 配置治理 / 渐进式发布。"
-            "GitHub：github.com/Lyhdsba/MoonFeatureGate；GitLink 同名仓库同步。",
+            "申报人：韦成昌｜3496197313@qq.com。项目方向：工程基础设施与工具链 / 配置治理 / 渐进式发布。"
+            "GitHub：github.com/wccerty/MoonFeatureGate；GitLink：gitlink.org.cn/Wccerty/MoonFeatureGate。",
             subtitle,
         ),
         p("项目简介", h2),

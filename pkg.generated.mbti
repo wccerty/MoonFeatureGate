@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "Lyhdsba/moonfeaturegate"
+package "Wccerty/moonfeaturegate"
 
 import {
   "moonbitlang/core/debug",
