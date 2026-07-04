@@ -1,4 +1,3 @@
 fn main {
-  println("MoonFeatureGate CLI")
-  println("Run examples after the evaluator is implemented.")
+  println(@lib.demo_output())
 }

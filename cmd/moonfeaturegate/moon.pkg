@@ -1,3 +1,7 @@
+import {
+  "Lyhdsba/moonfeaturegate" @lib
+}
+
 options(
   "is-main": true,
 )
