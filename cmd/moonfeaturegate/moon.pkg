@@ -1,5 +1,5 @@
 import {
-  "Wccerty/moonfeaturegate" @lib,
+  "wccerty/moonfeaturegate" @lib,
 }
 
 options(

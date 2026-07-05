@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "Wccerty/moonfeaturegate/cmd/moonfeaturegate"
+package "wccerty/moonfeaturegate/cmd/moonfeaturegate"
 
 // Values
 

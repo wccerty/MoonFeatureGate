@@ -41,15 +41,18 @@ management rather than those areas.
 GitHub and GitLink remotes should both point to the Wccerty/wccerty-owned
 submission repositories before final upload.
 
-## Mooncakes Dry Run
+## Mooncakes Publication
 
-`moon publish --dry-run` completed local package validation and checked the
-extracted package successfully. The final server step returned:
+- Module: `wccerty/moonfeaturegate`
+- Version: `0.1.0`
+- Documentation URL: `https://mooncakes.io/docs/wccerty/moonfeaturegate`
 
-```text
-403 Forbidden: User mismatch between the module owner and the authenticated Mooncakes account.
+Before publishing, run:
+
+```powershell
+moon whoami
+moon publish --dry-run
+moon publish
 ```
 
-Resolution: publish with Mooncakes credentials for `Wccerty`, or change
-`moon.mod` only if the competition account and repository owner are intentionally
-different.
+The authenticated Mooncakes username must match the module owner in `moon.mod`.

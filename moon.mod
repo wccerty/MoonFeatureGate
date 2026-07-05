@@ -9,7 +9,7 @@
 //   "moonbitlang/x@0.4.6",
 // }
 
-name = "Wccerty/moonfeaturegate"
+name = "wccerty/moonfeaturegate"
 
 version = "0.1.0"
 

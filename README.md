@@ -1,42 +1,55 @@
-MoonFeatureGate
-===============
-
-MoonFeatureGate：MoonBit 原生特性开关与灰度发布工具库。
-
-MoonFeatureGate 是一个 MoonBit 原生的特性开关与灰度发布工具库，支持本地规则评估、用户定向、稳定百分比分桶、命中原因解释和 CLI 校验，用于帮助 MoonBit 项目以可测试、可审查的方式进行功能灰度、实验开关和配置策略管理。
+# MoonFeatureGate
 
 MoonFeatureGate is a MoonBit-native feature flag and gradual rollout toolkit.
 It evaluates flags locally, explains why a value was chosen, and keeps the
 core runtime independent from a hosted control plane.
 
-The project is built for the 2026 MoonBit open-source ecosystem competition.
-It focuses on reusable engineering infrastructure: targeting rules, stable
-percentage rollout, typed flag values, CLI checks, examples, tests, and a
-clear path toward OpenFeature-style providers.
+This repository is prepared for the 2026 MoonBit open-source ecosystem
+competition. The project focuses on reusable engineering infrastructure:
+targeting rules, stable percentage rollout, typed flag values, CLI validation,
+examples, tests, and a clear path toward OpenFeature-style providers.
 
-Project Name
-------------
+## Project Summary
 
-MoonFeatureGate: MoonBit native feature flags and gradual rollout toolkit.
+MoonFeatureGate provides a compact local runtime for feature management in
+MoonBit projects. It is useful for libraries, demos, WASM applications, and
+small services that need auditable rollout decisions without depending on a
+remote feature-flag platform.
 
-Short description for proposal forms:
+Core capabilities in `0.1.0`:
 
-MoonFeatureGate is a MoonBit-native feature flag and gradual rollout toolkit.
-It supports local rule evaluation, user targeting, stable percentage buckets,
-decision explanations, and CLI validation so MoonBit projects can ship features
-through auditable rollout and configuration policies.
+- typed flag values for bool, string, int, and double values
+- local bool evaluation with default, disabled, static, rollout, and target
+  match explanations
+- deterministic 0..9999 rollout buckets over `flag_key:targeting_key`
+- a compact text configuration DSL
+- a runnable CLI demo
+- black-box and white-box MoonBit tests
+- CI verification for formatting, checks, tests, and demo execution
 
-Why This Exists
----------------
+## Quick Start
 
-MoonBit already has growing packages for parsing, databases, UI, tracing, and
-tooling. Feature management is a mature engineering area in other ecosystems,
-but a small MoonBit-native runtime is still useful for examples, services,
-WASM demos, and infrastructure libraries that need local decisions without
-calling a hosted feature-flag service.
+Run the verification set from the repository root:
 
-Core API
---------
+```powershell
+moon info
+moon fmt --check
+moon check --warn-list +73
+moon test
+moon run cmd/moonfeaturegate
+```
+
+Expected demo output:
+
+```text
+MoonFeatureGate demo
+flag=new_checkout
+user=user-42
+value=true
+reason=rollout_match
+```
+
+## Core API
 
 ```mbt
 test {
@@ -59,8 +72,7 @@ test {
 }
 ```
 
-Configuration DSL
------------------
+## Configuration DSL
 
 Each non-empty line defines one flag. Lines starting with `#` are comments.
 
@@ -69,36 +81,44 @@ flag new_checkout bool true rollout 2500
 flag beta_banner bool true target plan beta
 ```
 
-Supported v0.1 forms:
+Supported `0.1.0` forms:
 
 - `flag <key> bool <true|false>`
 - `flag <key> bool <true|false> rollout <0..10000>`
 - `flag <key> bool <true|false> target <attribute> <string-value>`
 
-Run
----
+## Repository Layout
 
-```powershell
-moon test
-moon run cmd/moonfeaturegate
-moon check --warn-list +73
-```
+- `MoonFeatureGate.mbt`, `provider.mbt`, `rollout.mbt`, `parser.mbt`:
+  core library implementation
+- `*_test.mbt`: library test coverage
+- `cmd/moonfeaturegate`: runnable CLI demo
+- `examples/flags.mfg`: sample configuration file
+- `docs/design.md`: design notes and extension direction
+- `docs/acceptance-checklist.md`: competition closeout checklist
+- `docs/closeout.md`: final submission notes
 
-Expected demo output:
+## Competition Notes
 
-```text
-MoonFeatureGate demo
-flag=new_checkout
-user=user-42
-value=true
-reason=rollout_match
-```
+- This is an original MoonBit project, not a direct port of a single upstream
+  library.
+- The design is informed by mature feature-flag systems and the
+  vendor-neutral OpenFeature idea, while the first release intentionally keeps
+  a compact local API.
+- The repository is public, licensed under Apache-2.0, and prepared for
+  Mooncakes publication.
+- Planned extensions include JSON/TOML providers, an OpenFeature-like provider
+  boundary, metrics hooks, remote config polling, and a small web preview.
 
-Competition Notes
------------------
+## Links
 
-- Original project; not a direct port of a single upstream library.
-- General design is informed by mature feature-flag systems and the
-  vendor-neutral OpenFeature idea, but v0.1 keeps a compact local API.
-- Planned extensions: JSON/TOML providers, OpenFeature-like provider boundary,
-  metrics hooks, remote config polling, and a small web preview.
+- GitHub: <https://github.com/wccerty/MoonFeatureGate>
+- GitLink: <https://gitlink.org.cn/Wccerty/MoonFeatureGate>
+- Mooncakes: <https://mooncakes.io/docs/wccerty/moonfeaturegate>
+
+## 中文简介
+
+MoonFeatureGate 是一个 MoonBit 原生的特性开关与灰度发布工具库。它支持本地规则评估、用户定向、
+稳定百分比分桶、命中原因解释和 CLI 校验，适合用于 MoonBit 项目的功能灰度、实验开关和配置策略管理。
+
+项目面向 MoonBit 开源生态建设，重点补齐工程基础设施方向中的“可测试、可审查、可复用”的本地特性管理能力。
