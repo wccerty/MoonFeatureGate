@@ -5,10 +5,10 @@
 Run from the repository root:
 
 ```powershell
-moon info
 moon fmt --check
-moon check --warn-list +73
-moon test
+moon check --deny-warn
+moon info
+moon test --deny-warn
 moon run cmd/moonfeaturegate
 ```
 
