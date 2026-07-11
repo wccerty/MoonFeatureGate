@@ -16,13 +16,25 @@ pub fn double_value(Double) -> FlagValue
 
 pub fn empty_provider() -> Provider
 
-pub fn evaluate_bool(Provider, String, EvalContext, default~ : Bool) -> BoolEvaluation
+pub fn[P : FeatureProvider] evaluate_bool(P, String, EvalContext, default~ : Bool) -> BoolEvaluation
+
+pub fn[P : FeatureProvider] evaluate_double(P, String, EvalContext, default~ : Double) -> DoubleEvaluation
+
+pub fn[P : FeatureProvider] evaluate_int(P, String, EvalContext, default~ : Int) -> IntEvaluation
+
+pub fn[P : FeatureProvider] evaluate_string(P, String, EvalContext, default~ : String) -> StringEvaluation
+
+pub fn[P : FeatureProvider] evaluate_value(P, String, EvalContext, default~ : FlagValue) -> ValueEvaluation
 
 pub fn int_value(Int) -> FlagValue
+
+pub fn parse_json_provider(String) -> JsonProvider?
 
 pub fn parse_provider(String) -> Provider raise ParseError
 
 pub fn rollout_bucket(String, String) -> Int
+
+pub fn run_benchmark() -> String
 
 pub fn string_value(String) -> FlagValue
 
@@ -38,13 +50,26 @@ pub(all) struct BoolEvaluation {
   reason : String
 } derive(Eq, @debug.Debug)
 
+pub(all) struct DoubleEvaluation {
+  flag_key : String
+  value : Double
+  reason : String
+} derive(Eq, @debug.Debug)
+
 pub(all) struct EvalContext {
   targeting_key : String
   attributes : Map[String, FlagValue]
 } derive(@debug.Debug)
 pub fn EvalContext::with_attr(Self, String, FlagValue) -> Self
 
-type FlagDefinition derive(@debug.Debug)
+pub(all) struct FlagDefinition {
+  key : String
+  value : FlagValue
+  enabled : Bool
+  rollout_percentage : Int?
+  target_attr : String?
+  target_value : FlagValue?
+} derive(@debug.Debug)
 
 pub(all) enum FlagValue {
   BoolValue(Bool)
@@ -54,14 +79,50 @@ pub(all) enum FlagValue {
 } derive(Eq, @debug.Debug)
 pub fn FlagValue::to_text(Self) -> String
 
+pub(all) struct IntEvaluation {
+  flag_key : String
+  value : Int
+  reason : String
+} derive(Eq, @debug.Debug)
+
+pub struct JsonProvider {
+  flags : Map[String, FlagDefinition]
+} derive(@debug.Debug)
+pub impl FeatureProvider for JsonProvider
+
 pub struct Provider {
   flags : Map[String, FlagDefinition]
 } derive(@debug.Debug)
 pub fn Provider::with_bool(Self, String, Bool, enabled? : Bool) -> Self
 pub fn Provider::with_bool_rollout(Self, String, Bool, percentage~ : Int, enabled? : Bool) -> Self
 pub fn Provider::with_bool_target(Self, String, Bool, attr~ : String, equals~ : FlagValue, enabled? : Bool) -> Self
+pub fn Provider::with_double(Self, String, Double, enabled? : Bool) -> Self
+pub fn Provider::with_double_rollout(Self, String, Double, percentage~ : Int, enabled? : Bool) -> Self
+pub fn Provider::with_double_target(Self, String, Double, attr~ : String, equals~ : FlagValue, enabled? : Bool) -> Self
+pub fn Provider::with_int(Self, String, Int, enabled? : Bool) -> Self
+pub fn Provider::with_int_rollout(Self, String, Int, percentage~ : Int, enabled? : Bool) -> Self
+pub fn Provider::with_int_target(Self, String, Int, attr~ : String, equals~ : FlagValue, enabled? : Bool) -> Self
+pub fn Provider::with_string(Self, String, String, enabled? : Bool) -> Self
+pub fn Provider::with_string_rollout(Self, String, String, percentage~ : Int, enabled? : Bool) -> Self
+pub fn Provider::with_string_target(Self, String, String, attr~ : String, equals~ : FlagValue, enabled? : Bool) -> Self
+pub impl FeatureProvider for Provider
+
+pub(all) struct StringEvaluation {
+  flag_key : String
+  value : String
+  reason : String
+} derive(Eq, @debug.Debug)
+
+pub(all) struct ValueEvaluation {
+  flag_key : String
+  value : FlagValue
+  reason : String
+} derive(Eq, @debug.Debug)
 
 // Type aliases
 
 // Traits
+pub trait FeatureProvider {
+  fn get_flag_definition(Self, String) -> FlagDefinition?
+}
 

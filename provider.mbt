@@ -1,5 +1,5 @@
 ///|
-struct FlagDefinition {
+pub(all) struct FlagDefinition {
   key : String
   value : FlagValue
   enabled : Bool
@@ -12,6 +12,14 @@ struct FlagDefinition {
 pub struct Provider {
   flags : Map[String, FlagDefinition]
 } derive(Debug)
+
+///|
+pub impl FeatureProvider for Provider with fn get_flag_definition(
+  self : Provider,
+  key : String,
+) -> FlagDefinition? {
+  self.flags.get(key)
+}
 
 ///|
 pub(all) struct BoolEvaluation {
@@ -86,6 +94,186 @@ pub fn Provider::with_bool_target(
 }
 
 ///|
+pub fn Provider::with_string(
+  self : Provider,
+  key : String,
+  value : String,
+  enabled? : Bool = true,
+) -> Provider {
+  let next = self.flags.copy()
+  next[key] = {
+    key,
+    value: StringValue(value),
+    enabled,
+    rollout_percentage: None,
+    target_attr: None,
+    target_value: None,
+  }
+  { flags: next }
+}
+
+///|
+pub fn Provider::with_string_rollout(
+  self : Provider,
+  key : String,
+  value : String,
+  percentage~ : Int,
+  enabled? : Bool = true,
+) -> Provider {
+  let next = self.flags.copy()
+  next[key] = {
+    key,
+    value: StringValue(value),
+    enabled,
+    rollout_percentage: Some(clamp_percentage(percentage)),
+    target_attr: None,
+    target_value: None,
+  }
+  { flags: next }
+}
+
+///|
+pub fn Provider::with_string_target(
+  self : Provider,
+  key : String,
+  value : String,
+  attr~ : String,
+  equals~ : FlagValue,
+  enabled? : Bool = true,
+) -> Provider {
+  let next = self.flags.copy()
+  next[key] = {
+    key,
+    value: StringValue(value),
+    enabled,
+    rollout_percentage: None,
+    target_attr: Some(attr),
+    target_value: Some(equals),
+  }
+  { flags: next }
+}
+
+///|
+pub fn Provider::with_int(
+  self : Provider,
+  key : String,
+  value : Int,
+  enabled? : Bool = true,
+) -> Provider {
+  let next = self.flags.copy()
+  next[key] = {
+    key,
+    value: IntValue(value),
+    enabled,
+    rollout_percentage: None,
+    target_attr: None,
+    target_value: None,
+  }
+  { flags: next }
+}
+
+///|
+pub fn Provider::with_int_rollout(
+  self : Provider,
+  key : String,
+  value : Int,
+  percentage~ : Int,
+  enabled? : Bool = true,
+) -> Provider {
+  let next = self.flags.copy()
+  next[key] = {
+    key,
+    value: IntValue(value),
+    enabled,
+    rollout_percentage: Some(clamp_percentage(percentage)),
+    target_attr: None,
+    target_value: None,
+  }
+  { flags: next }
+}
+
+///|
+pub fn Provider::with_int_target(
+  self : Provider,
+  key : String,
+  value : Int,
+  attr~ : String,
+  equals~ : FlagValue,
+  enabled? : Bool = true,
+) -> Provider {
+  let next = self.flags.copy()
+  next[key] = {
+    key,
+    value: IntValue(value),
+    enabled,
+    rollout_percentage: None,
+    target_attr: Some(attr),
+    target_value: Some(equals),
+  }
+  { flags: next }
+}
+
+///|
+pub fn Provider::with_double(
+  self : Provider,
+  key : String,
+  value : Double,
+  enabled? : Bool = true,
+) -> Provider {
+  let next = self.flags.copy()
+  next[key] = {
+    key,
+    value: DoubleValue(value),
+    enabled,
+    rollout_percentage: None,
+    target_attr: None,
+    target_value: None,
+  }
+  { flags: next }
+}
+
+///|
+pub fn Provider::with_double_rollout(
+  self : Provider,
+  key : String,
+  value : Double,
+  percentage~ : Int,
+  enabled? : Bool = true,
+) -> Provider {
+  let next = self.flags.copy()
+  next[key] = {
+    key,
+    value: DoubleValue(value),
+    enabled,
+    rollout_percentage: Some(clamp_percentage(percentage)),
+    target_attr: None,
+    target_value: None,
+  }
+  { flags: next }
+}
+
+///|
+pub fn Provider::with_double_target(
+  self : Provider,
+  key : String,
+  value : Double,
+  attr~ : String,
+  equals~ : FlagValue,
+  enabled? : Bool = true,
+) -> Provider {
+  let next = self.flags.copy()
+  next[key] = {
+    key,
+    value: DoubleValue(value),
+    enabled,
+    rollout_percentage: None,
+    target_attr: Some(attr),
+    target_value: Some(equals),
+  }
+  { flags: next }
+}
+
+///|
 fn target_matches(flag : FlagDefinition, ctx : EvalContext) -> Bool {
   match (flag.target_attr, flag.target_value) {
     (Some(attr), Some(expected)) =>
@@ -98,14 +286,14 @@ fn target_matches(flag : FlagDefinition, ctx : EvalContext) -> Bool {
 }
 
 ///|
-pub fn evaluate_bool(
-  provider : Provider,
+pub fn[P : FeatureProvider] evaluate_bool(
+  provider : P,
   flag_key : String,
   ctx : EvalContext,
   default~ : Bool,
 ) -> BoolEvaluation {
   ignore(ctx)
-  match provider.flags.get(flag_key) {
+  match provider.get_flag_definition(flag_key) {
     Some(flag) =>
       if !flag.enabled {
         { flag_key, value: default, reason: "disabled" }
