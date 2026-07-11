@@ -19,11 +19,13 @@ remote feature-flag platform.
 Core capabilities in `0.1.0`:
 
 - typed flag values for bool, string, int, and double values
-- local bool evaluation with default, disabled, static, rollout, and target
-  match explanations
+- local evaluation for bool, string, int, double, and generic FlagValue types
+- Trait-decoupled `FeatureProvider` interface for custom providers
+- JSON configuration parsing & JSON provider
+- local evaluation with default, disabled, static, rollout, and target match explanations
 - deterministic 0..9999 rollout buckets over `flag_key:targeting_key`
 - a compact text configuration DSL
-- a runnable CLI demo
+- a runnable CLI demo & iteration benchmark
 - black-box and white-box MoonBit tests
 - CI verification for formatting, checks, tests, and demo execution
 
@@ -32,21 +34,38 @@ Core capabilities in `0.1.0`:
 Run the verification set from the repository root:
 
 ```powershell
-moon info
 moon fmt --check
-moon check --warn-list +73
-moon test
+moon check --deny-warn
+moon info
+moon test --deny-warn
 moon run cmd/moonfeaturegate
 ```
 
 Expected demo output:
 
 ```text
-MoonFeatureGate demo
-flag=new_checkout
-user=user-42
-value=true
-reason=rollout_match
+========================================
+MoonFeatureGate Premium CLI Demo
+========================================
+[JSON Config Loaded successfully]
+
+1. Boolean Flag (enable_new_ui):
+   Value:  true
+   Reason: rollout_match
+
+2. String Flag (theme_color):
+   Value:  ocean-blue
+   Reason: static
+
+3. Integer Flag (max_connections):
+   Value:  128
+   Reason: target_match
+
+========================================
+Performance Benchmark Status
+========================================
+Completed 100000 iterations of multi-type evaluation successfully.
+========================================
 ```
 
 ## Core API
