@@ -38,3 +38,28 @@ test "text config reports invalid lines" {
     _ => fail("expected parse error")
   }
 }
+
+///|
+test "text config clamps rollout percentages to documented boundaries" {
+  let config =
+    #|flag always_on bool true rollout 10001
+    #|flag always_off bool true rollout 0
+  let provider = @moonfeaturegate.parse_provider(config)
+  let ctx = @moonfeaturegate.context("user-1")
+  let on = @moonfeaturegate.evaluate_bool(
+    provider,
+    "always_on",
+    ctx,
+    default=false,
+  )
+  let off = @moonfeaturegate.evaluate_bool(
+    provider,
+    "always_off",
+    ctx,
+    default=false,
+  )
+  assert_true(on.value)
+  inspect(on.reason, content="rollout_match")
+  assert_false(off.value)
+  inspect(off.reason, content="rollout_miss")
+}

@@ -6,7 +6,7 @@ pub(all) struct EvalContext {
 
 ///|
 pub fn context(targeting_key : String) -> EvalContext {
-  { targeting_key, attributes: {} }
+  { targeting_key, attributes: Map([]) }
 }
 
 ///|

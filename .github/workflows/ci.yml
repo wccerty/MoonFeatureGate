@@ -7,6 +7,8 @@ on:
 jobs:
   test:
     name: Test (${{ matrix.os }})
+    permissions:
+      contents: read
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -20,6 +22,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Setup Moon env (Linux)
         if: runner.os == 'Linux'
@@ -56,6 +60,8 @@ jobs:
 
       - name: Moon Check
         run: |
+          moon version --all
+          moon update
           moon fmt --check
           moon check --deny-warn
           moon info

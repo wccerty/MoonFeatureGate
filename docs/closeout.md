@@ -1,53 +1,43 @@
-# MoonFeatureGate Closeout Notes
+# MoonFeatureGate Re-acceptance Closeout
 
-Date: 2026-07-05
+Date: 2026-08-07
 
-## Submission Identity
+## Submission identity
 
 - Project: MoonFeatureGate
-- Author: 韦成昌
-- Email: 3496197313@qq.com
-- GitHub: https://github.com/wccerty/MoonFeatureGate
-- GitLink: https://gitlink.org.cn/Wccerty/MoonFeatureGate
-- Mooncakes: https://mooncakes.io/docs/wccerty/moonfeaturegate
+- Author: 魏承昌
+- Git author: `Wccerty <3496197313@qq.com>`
+- GitHub: <https://github.com/wccerty/MoonFeatureGate>
+- GitLink: <https://gitlink.org.cn/Wccerty/MoonFeatureGate>
+- Mooncakes: <https://mooncakes.io/docs/wccerty/moonfeaturegate>
 
-## Scope Delivered
+## Remediation delivered
 
-MoonFeatureGate delivers a MoonBit-native local feature flag runtime:
+- Updated empty maps to explicit `Map([])` so `moon check --deny-warn` is stable
+  on the MoonBit 0.10.3-compatible toolchain.
+- Updated the CLI package to `pkgtype(kind: "executable")` and documented the
+  exact `moon run cmd/moonfeaturegate` command.
+- Added strict JSON schema validation and tests for malformed JSON, wrong field
+  types, empty maps, disabled flags, type mismatches, targets and rollout edges.
+- Rewrote the README and acceptance materials as UTF-8 with reproducible
+  installation, `moon add`, JSON, DSL, CLI and CI instructions.
+- Kept the public API package-local and regenerated `.mbti` files with `moon info`.
 
-- typed values
-- local provider construction
-- bool evaluation with explanation
-- deterministic rollout buckets
-- attribute-based targeting
-- compact configuration parser
-- runnable CLI demo
-- automated tests and CI
-
-## Verification Commands
-
-Run from repository root:
+## Verification commands
 
 ```powershell
-moon info
 moon fmt --check
-moon check --warn-list +73
-moon test
+moon check --deny-warn
+moon info
+moon test --deny-warn
+moon test --deny-warn --target native --enable-coverage
+moon coverage report -f summary
+moon coverage analyze
 moon run cmd/moonfeaturegate
-moon publish --dry-run
 ```
 
-## Competition Requirement Mapping
+## Future maintenance
 
-- MoonBit is the primary implementation language.
-- The repository is public on GitHub and mirrored on GitLink.
-- The project uses the OSI-approved Apache-2.0 license.
-- README, design notes, runnable examples, tests, and CI are included.
-- The package is prepared for Mooncakes publication as
-  `wccerty/moonfeaturegate`.
-
-## Future Maintenance
-
-The next practical extension is to add JSON/TOML providers while keeping the
-current local evaluator stable. After that, the provider interface can grow
-toward an OpenFeature-style boundary and optional telemetry hooks.
+The next useful extensions are TOML/provider adapters, remote configuration
+polling, metrics hooks, and a small web preview. They should preserve the
+current local evaluator and provider contracts.

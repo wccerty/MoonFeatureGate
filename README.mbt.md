@@ -2,10 +2,15 @@ MoonFeatureGate
 ===============
 
 MoonFeatureGate is a MoonBit-native feature flag and gradual rollout toolkit.
-It evaluates flags locally, explains why a value was chosen, and keeps the
-core runtime independent from a hosted control plane.
+It evaluates flags locally, keeps rollout decisions deterministic, and returns
+an explanation for every decision.
 
-The project is built for the 2026 MoonBit open-source ecosystem competition.
-It focuses on reusable engineering infrastructure: targeting rules, stable
-percentage rollout, typed flag values, CLI checks, examples, tests, and a
-clear path toward OpenFeature-style providers.
+```mbt check
+///|
+test "README example evaluates a static flag" {
+  let provider = empty_provider().with_bool("demo", true)
+  let detail = evaluate_bool(provider, "demo", context("user-1"), default=false)
+  inspect(detail.value, content="true")
+  inspect(detail.reason, content="static")
+}
+```

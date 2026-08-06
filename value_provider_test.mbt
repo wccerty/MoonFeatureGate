@@ -22,3 +22,33 @@ test "flag values render stable text for CLI and docs" {
   )
   inspect(@moonfeaturegate.int_value(42).to_text(), content="42")
 }
+
+///|
+test "disabled flags return the caller default" {
+  let provider = @moonfeaturegate.empty_provider().with_bool(
+    "kill_switch",
+    true,
+    enabled=false,
+  )
+  let detail = @moonfeaturegate.evaluate_bool(
+    provider,
+    "kill_switch",
+    @moonfeaturegate.context("user-1"),
+    default=false,
+  )
+  assert_false(detail.value)
+  inspect(detail.reason, content="disabled")
+}
+
+///|
+test "typed evaluation explains a type mismatch" {
+  let provider = @moonfeaturegate.empty_provider().with_string("theme", "ocean")
+  let detail = @moonfeaturegate.evaluate_bool(
+    provider,
+    "theme",
+    @moonfeaturegate.context("user-1"),
+    default=true,
+  )
+  assert_true(detail.value)
+  inspect(detail.reason, content="type_mismatch")
+}

@@ -1,58 +1,50 @@
-# Acceptance Checklist
+# OSC2026 Acceptance Checklist
 
-## Local Verification
+## Reproducible local verification
 
-Run from the repository root:
+Run from the repository root with MoonBit 0.10.3 or a newer stable toolchain:
 
 ```powershell
+moon version
 moon fmt --check
 moon check --deny-warn
 moon info
 moon test --deny-warn
 moon run cmd/moonfeaturegate
+moon test --deny-warn --target native --enable-coverage
+moon coverage report -f summary
+moon coverage analyze
 ```
 
-## Repository Requirements
+The strict checks must finish with zero warnings and zero failed tests. The CLI
+must print the JSON-loaded demo, rollout/target reasons, and the 100000-iteration
+benchmark line.
 
-- Public GitHub repository: `https://github.com/wccerty/MoonFeatureGate`
-- GitLink repository: `https://gitlink.org.cn/Wccerty/MoonFeatureGate`
-- License: Apache-2.0.
-- README is a regular file, not a symlink.
-- Commit history should contain 10-20 meaningful commits before submission.
-- Do not use empty commits or artificial split-only commits.
+## Repository requirements
 
-## Mooncakes Overlap Check
+- GitHub: `https://github.com/wccerty/MoonFeatureGate`
+- GitLink: `https://gitlink.org.cn/Wccerty/MoonFeatureGate`
+- License: Apache-2.0, stored as a regular `LICENSE` file.
+- README: regular UTF-8 file with installation, `moon add`, CLI, JSON, DSL and
+  verification instructions.
+- Public MoonBit API: generated `pkg.generated.mbti` is checked by `moon info`.
+- History: existing public history has meaningful development commits; do not
+  add empty or artificial split-only commits.
+- CI: `.github/workflows/ci.yml` covers Linux, macOS and Windows.
 
-Checked keywords before implementation:
+## Boundary coverage
 
-- `moongate`
-- `featuregate`
-- `feature flag`
-- `openfeature`
-- `rollout`
+- Empty `Map([])` provider/context and empty JSON `flags` object.
+- Disabled flag returns caller default with `disabled` reason.
+- Wrong typed evaluator returns caller default with `type_mismatch` reason.
+- Missing target attribute and non-matching target return `target_miss`.
+- Rollout values cover `0`, `10000`, and over-limit clamping.
+- Malformed JSON and malformed DSL lines fail explicitly.
 
-No directly overlapping Mooncakes package was found for a MoonBit feature flag
-and rollout toolkit. Adjacent packages exist for OpenTelemetry, tracing,
-logging, config parsing, and policy engines, so this project focuses on feature
-management rather than those areas.
+## Publication metadata
 
-## Current Remote Prerequisites
-
-GitHub and GitLink remotes should both point to the Wccerty/wccerty-owned
-submission repositories before final upload.
-
-## Mooncakes Publication
-
-- Module: `wccerty/moonfeaturegate`
-- Version: `0.1.0`
-- Documentation URL: `https://mooncakes.io/docs/wccerty/moonfeaturegate`
-
-Before publishing, run:
-
-```powershell
-moon whoami
-moon publish --dry-run
-moon publish
-```
-
-The authenticated Mooncakes username must match the module owner in `moon.mod`.
+- Module: `wccerty/moonfeaturegate`.
+- Version: `0.1.1`.
+- Repository URL in `moon.mod` points to GitHub.
+- GitHub and GitLink are synchronized from the same creator-authored commit.
+- Mooncakes publication must use the authenticated `wccerty` account.

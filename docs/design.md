@@ -13,6 +13,15 @@ future telemetry can explain the decision.
 4. Percentage rollout uses a stable 0..9999 bucket from `flag_key:targeting_key`.
 5. A matching static bool flag returns reason `static`.
 
+## Configuration Validation
+
+The JSON provider accepts either a top-level `flags` object or a direct map of
+flag definitions. An explicitly empty `flags` object is valid. The parser
+rejects malformed JSON, non-object `flags`, non-object flag definitions,
+non-primitive values, non-boolean `enabled`, non-integral or out-of-range
+`rollout_percentage`, and incomplete target pairs instead of silently dropping
+invalid entries.
+
 ## Scope
 
 The first version deliberately avoids a hosted control plane. This keeps the

@@ -1,4 +1,6 @@
+import hashlib
 from pathlib import Path
+from typing import Tuple
 
 from reportlab import rl_config
 from reportlab.lib import colors
@@ -6,6 +8,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase import pdfdoc
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
@@ -13,18 +16,25 @@ from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, Tabl
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "proposal.pdf"
 FONT = Path(r"C:\Windows\Fonts\simhei.ttf")
-BOLD_FONT = Path(r"C:\Windows\Fonts\simhei.ttf")
 
 
-def register_fonts() -> tuple[str, str]:
-    regular = "NotoSansSC"
-    bold = "NotoSansSC-Bold"
+def md5_compat(*args, **kwargs):
+    kwargs.pop("usedforsecurity", None)
+    return hashlib.md5(*args, **kwargs)
+
+
+pdfdoc.md5 = md5_compat
+
+
+def register_fonts() -> Tuple[str, str]:
+    regular = "SimHei"
+    bold = "SimHei-Bold"
     pdfmetrics.registerFont(TTFont(regular, str(FONT)))
-    pdfmetrics.registerFont(TTFont(bold, str(BOLD_FONT)))
+    pdfmetrics.registerFont(TTFont(bold, str(FONT)))
     return regular, bold
 
 
-def p(text: str, style: ParagraphStyle) -> Paragraph:
+def paragraph(text: str, style: ParagraphStyle) -> Paragraph:
     return Paragraph(text, style)
 
 
@@ -49,8 +59,8 @@ def main() -> None:
         textColor=colors.HexColor("#4b5563"),
         spaceAfter=8,
     )
-    h2 = ParagraphStyle(
-        "h2",
+    heading = ParagraphStyle(
+        "heading",
         fontName=bold,
         fontSize=11,
         leading=15,
@@ -84,34 +94,28 @@ def main() -> None:
     )
 
     story = [
-        p("MoonFeatureGate：MoonBit 原生特性开关与灰度发布工具库", title),
-        p(
-            "申报人：韦成昌｜3496197313@qq.com。项目方向：工程基础设施与工具链 / 配置治理 / 渐进式发布。"
+        paragraph("MoonFeatureGate：MoonBit 原生功能开关与灰度发布工具库", title),
+        paragraph(
+            "申报人：魏承昌（Wccerty）｜版本：0.1.1｜方向：工程基础设施与工具链。"
             "GitHub：github.com/wccerty/MoonFeatureGate；GitLink：gitlink.org.cn/Wccerty/MoonFeatureGate。",
             subtitle,
         ),
-        p("项目简介", h2),
-        p(
-            "MoonFeatureGate 面向 MoonBit 生态提供本地特性开关、用户定向、稳定百分比分桶和命中原因解释。"
-            "它不依赖外部 SaaS 控制台，适合 MoonBit 服务端示例、WASM 演示、教学项目和基础设施库在上线前做可审查的功能灰度与配置策略管理。",
+        paragraph("项目简介", heading),
+        paragraph(
+            "MoonFeatureGate 面向 MoonBit 生态提供本地功能开关、用户定向、稳定百分比 rollout "
+            "和决策原因解释。它不依赖外部 SaaS 控制台，适合服务端、WASM 示例、教学项目和上线前的可审计配置。",
             body,
         ),
-        p("为什么值得做", h2),
-        p(
-            "特性开关是成熟工程体系中的常见能力，但 MoonBit 生态目前更集中在解析器、日志、数据库、UI、Tracing 等方向。"
-            "Mooncakes 关键词检索未发现直接的 feature flag / OpenFeature / rollout 同类包；本项目补齐的是发布风险控制与配置治理这一基础能力。",
-            body,
-        ),
-        p("核心功能边界", h2),
+        paragraph("核心能力", heading),
     ]
 
     data = [
-        [p("模块", small), p("首版交付", small)],
-        [p("FlagValue", small), p("bool、string、int、double 等类型化值，稳定文本输出。", small)],
-        [p("EvalContext", small), p("targeting_key 与属性 Map，用于用户、环境、请求等上下文。", small)],
-        [p("Provider", small), p("本地内存 provider，支持静态 bool flag、target 规则、百分比 rollout。", small)],
-        [p("Evaluator", small), p("返回 value、flag_key、reason，解释 default / static / target / rollout 等路径。", small)],
-        [p("DSL + CLI", small), p("简洁配置文本解析、示例配置、可运行 CLI demo 与 CI 验证。", small)],
+        [paragraph("模块", small), paragraph("0.1.1 交付内容", small)],
+        [paragraph("FlagValue", small), paragraph("支持 Bool、String、Int、Double 四类类型安全值。", small)],
+        [paragraph("EvalContext", small), paragraph("支持 targeting_key 和属性 Map，可表达用户、环境和请求上下文。", small)],
+        [paragraph("Provider", small), paragraph("支持本地 provider、FeatureProvider trait、JSON provider 和文本 DSL。", small)],
+        [paragraph("Evaluator", small), paragraph("返回值、flag_key 和 default / disabled / target / rollout 等原因。", small)],
+        [paragraph("工程化", small), paragraph("包含 CLI demo、黑盒/白盒测试、空 Map/类型不匹配/畸形 JSON 边界测试和跨平台 CI。", small)],
     ]
     table = Table(data, colWidths=[32 * mm, 124 * mm])
     table.setStyle(
@@ -132,22 +136,26 @@ def main() -> None:
         [
             table,
             Spacer(1, 5),
-            p("实现计划", h2),
-            p(
-                "已经完成项目骨架、类型化值、默认回退、稳定分桶、属性定向、文本配置解析、CLI demo、测试和 CI。"
-                "后续验收前继续补充 Mooncakes 发布信息、更多配置样例和 README 使用说明，并保持 GitHub 与 GitLink 仓库同步。",
+            paragraph("验收修订", heading),
+            paragraph(
+                "针对预验收意见，项目已将空 Map 改为显式 Map([])，将 CLI 包改为 "
+                "pkgtype(kind: \"executable\")，并在 README 中补充 MoonBit 0.10.3 安装、"
+                "moon add、严格验证和可执行 demo 步骤。JSON provider 现在拒绝错误根结构、"
+                "字段类型、目标字段和 rollout 范围，避免静默丢弃错误配置。",
                 body,
             ),
-            p("最终交付", h2),
-            p(
-                "公开源码仓库、10-20 个有效 commits、Apache-2.0 许可证、README、示例配置、设计文档、验收清单、CI、"
-                "可运行 MoonBit 测试与 CLI demo、Mooncakes 发布或 dry-run 记录。",
+            paragraph("复现命令", heading),
+            paragraph(
+                "moon fmt --check ｜ moon check --deny-warn ｜ moon info ｜ "
+                "moon test --deny-warn ｜ moon run cmd/moonfeaturegate。"
+                "CI 额外覆盖 native 测试与 coverage analyze。",
                 body,
             ),
-            p("原创性说明", h2),
-            p(
-                "本项目为原创 MoonBit 工程库，不移植单个既有项目。设计参考成熟特性开关领域的通用概念和 OpenFeature 的厂商无关思想，"
-                "首版聚焦 MoonBit 本地评估能力，后续可扩展 OpenFeature 风格 provider、远程配置、指标导出和 Web 预览。",
+            paragraph("开源与维护", heading),
+            paragraph(
+                "项目使用 Apache-2.0，公开维护在 GitHub 与 GitLink，模块名为 "
+                "wccerty/moonfeaturegate。后续可在保持 evaluator API 稳定的前提下扩展 TOML、"
+                "远程配置轮询、指标钩子和 Web 预览。",
                 body,
             ),
         ]

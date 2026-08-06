@@ -30,7 +30,7 @@ pub(all) struct BoolEvaluation {
 
 ///|
 pub fn empty_provider() -> Provider {
-  { flags: {} }
+  { flags: Map([]) }
 }
 
 ///|

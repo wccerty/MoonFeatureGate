@@ -36,3 +36,29 @@ test "JSON provider parsing and multi-type evaluation" {
   inspect(eval_double.value, content="3.14")
   inspect(eval_double.reason, content="static")
 }
+
+///|
+test "JSON provider rejects malformed JSON and flag schemas" {
+  assert_true(parse_json_provider("{") is None)
+  let invalid_root =
+    #|{"flags": []}
+  assert_true(parse_json_provider(invalid_root) is None)
+  let invalid_flag =
+    #|{"flags": {"bad": {"value": true, "enabled": "yes"}}}
+  assert_true(parse_json_provider(invalid_flag) is None)
+}
+
+///|
+test "JSON provider accepts an explicit empty flags map" {
+  let empty_flags =
+    #|{"flags": {}}
+  let provider = parse_json_provider(empty_flags).unwrap()
+  let detail = evaluate_bool(
+    provider,
+    "missing",
+    context("user-1"),
+    default=true,
+  )
+  assert_true(detail.value)
+  inspect(detail.reason, content="default")
+}
