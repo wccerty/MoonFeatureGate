@@ -1,9 +1,26 @@
 # Changelog
 
+## 0.1.2 - 2026-08-12
+
+- Added immutable context helpers, batch evaluation, reason aggregation, and a
+  privacy-friendly decision ledger for service and WASM integrations.
+- Added provider merge/remove/select tools, deterministic fingerprints, DSL
+  export and round-trip parsing, diff/compatibility reports, inventories, and
+  health/deployment preflight checks.
+- Extended the DSL to bool, string, int, and double values, including explicit
+  `disabled` flags and production-shaped configuration examples.
+- Added 12 deterministic benchmark scenarios plus a four-context acceptance
+  matrix covering release gates, experiments, capacity, regional policy,
+  safety, caching, search, mobile, workers, observability, media, and
+  maintenance use cases.
+- Expanded the test suite to 45 passing tests and raised non-test MoonBit source
+  size above 3,000 lines.
+
 ## 0.1.1 - 2026-08-07
 
 - Fixed MoonBit 0.10.3-compatible empty-map syntax with explicit `Map([])`.
-- Fixed the executable package declaration to use `pkgtype(kind: "executable")`.
+- Fixed the executable package declaration to use MoonBit 0.10.3-compatible
+  `options("is-main": true)`.
 - Made JSON provider schema validation explicit for malformed roots, field types,
   target pairs, and rollout percentage bounds.
 - Added regression tests for disabled flags, type mismatches, malformed JSON,

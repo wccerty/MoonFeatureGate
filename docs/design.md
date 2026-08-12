@@ -22,9 +22,31 @@ non-primitive values, non-boolean `enabled`, non-integral or out-of-range
 `rollout_percentage`, and incomplete target pairs instead of silently dropping
 invalid entries.
 
+## Batch evaluation and governance
+
+`evaluate_batch` evaluates typed requests against one immutable context and
+returns both individual `ValueEvaluation` records and reason counters. A
+`DecisionLedger` aggregates counters without retaining targeting keys or user
+identifiers. `Provider::audit`, `Provider::check_policy`, and
+`Provider::health_check` make configuration defects visible before activation.
+
+`diff_providers` distinguishes identical, additive, changed, and breaking
+configuration updates. `ProviderRegistry` stores named audited snapshots, while
+`deployment_check` combines health and compatibility into a pure deployment
+decision suitable for CI and release tooling.
+
+## Benchmark and replay scope
+
+`benchmark_cases.mbt` contains 12 deterministic, application-shaped fixtures:
+release gates, experiments, capacity, regional policy, safety, caching,
+search, mobile, workers, observability, media, and maintenance. Each case is
+replayed in `run_scenario_benchmark` and `run_acceptance_scenario` over multiple
+contexts. The benchmark intentionally uses synthetic non-customer data so it
+is safe to publish and reproducible on every platform.
+
 ## Scope
 
-The first version deliberately avoids a hosted control plane. This keeps the
+The current release deliberately avoids a hosted control plane. This keeps the
 runtime useful for MoonBit examples, tests, local services, and WASM demos.
 The extension point is the `Provider`: later providers can load JSON, TOML,
 Mooncakes-hosted examples, or remote configuration without changing the public

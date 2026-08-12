@@ -2,4 +2,6 @@ import {
   "wccerty/moonfeaturegate" @lib,
 }
 
-pkgtype(kind: "executable")
+options(
+  "is-main": true,
+)

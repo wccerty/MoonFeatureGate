@@ -64,6 +64,7 @@ jobs:
           moon update
           moon fmt --check
           moon check --deny-warn
+          moon check --deny-warn --target all
           moon info
           git diff --exit-code
           git status
@@ -71,6 +72,7 @@ jobs:
       - name: Moon test
         run: |
           moon test --deny-warn --enable-coverage
+          moon test --deny-warn --target all --enable-coverage
           moon coverage report -f summary
           moon coverage analyze
 

@@ -11,6 +11,8 @@ moon check --deny-warn
 moon info
 moon test --deny-warn
 moon run cmd/moonfeaturegate
+moon check --deny-warn --target wasm-gc
+moon test --deny-warn --target wasm-gc
 moon test --deny-warn --target native --enable-coverage
 moon coverage report -f summary
 moon coverage analyze
@@ -31,6 +33,8 @@ benchmark line.
 - History: existing public history has meaningful development commits; do not
   add empty or artificial split-only commits.
 - CI: `.github/workflows/ci.yml` covers Linux, macOS and Windows.
+- Scope: non-test MoonBit source is above 3,000 lines and is organized into
+  evaluator, provider, parser, audit, policy, scenario, and deployment layers.
 
 ## Boundary coverage
 
@@ -40,11 +44,16 @@ benchmark line.
 - Missing target attribute and non-matching target return `target_miss`.
 - Rollout values cover `0`, `10000`, and over-limit clamping.
 - Malformed JSON and malformed DSL lines fail explicitly.
+- Multi-type DSL round-trip preserves rollout, target, and disabled metadata.
+- The deterministic benchmark contains 12 application-shaped scenarios; the
+  acceptance matrix replays them across four contexts.
+- Provider audit, production policy, compatibility diff, health check, and
+  deployment decision are covered by executable tests.
 
 ## Publication metadata
 
 - Module: `wccerty/moonfeaturegate`.
-- Version: `0.1.1`.
+- Version: `0.1.2`.
 - Repository URL in `moon.mod` points to GitHub.
 - GitHub and GitLink are synchronized from the same creator-authored commit.
 - Mooncakes publication must use the authenticated `wccerty` account.

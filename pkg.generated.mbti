@@ -6,15 +6,31 @@ import {
 }
 
 // Values
+pub fn acceptance_scenario() -> EvaluationScenario
+
+pub fn benchmark_cases() -> Array[BenchmarkCase]
+
 pub fn bool_value(Bool) -> FlagValue
+
+pub fn compare_providers(Provider, Provider) -> CompatibilityReport
 
 pub fn context(String) -> EvalContext
 
+pub fn default_policy() -> ProviderPolicy
+
 pub fn demo_output() -> String
+
+pub fn deployment_check(Provider?, Provider, ProviderPolicy) -> DeploymentDecision
+
+pub fn diff_providers(Provider, Provider) -> ProviderDiff
 
 pub fn double_value(Double) -> FlagValue
 
+pub fn empty_context() -> EvalContext
+
 pub fn empty_provider() -> Provider
+
+pub fn[P : FeatureProvider] evaluate_batch(P, Array[EvaluationRequest], EvalContext) -> BatchResult
 
 pub fn[P : FeatureProvider] evaluate_bool(P, String, EvalContext, default~ : Bool) -> BoolEvaluation
 
@@ -26,15 +42,39 @@ pub fn[P : FeatureProvider] evaluate_string(P, String, EvalContext, default~ : S
 
 pub fn[P : FeatureProvider] evaluate_value(P, String, EvalContext, default~ : FlagValue) -> ValueEvaluation
 
+pub fn[P : FeatureProvider] evaluate_with_ledger(P, Array[EvaluationRequest], EvalContext, DecisionLedger) -> BatchResult
+
 pub fn int_value(Int) -> FlagValue
+
+pub fn measure_rollout(String, Array[String], Int) -> RolloutDistribution
+
+pub fn new_ledger() -> DecisionLedger
+
+pub fn new_registry() -> ProviderRegistry
 
 pub fn parse_json_provider(String) -> JsonProvider?
 
 pub fn parse_provider(String) -> Provider raise ParseError
 
+pub fn request(String, FlagValue) -> EvaluationRequest
+
 pub fn rollout_bucket(String, String) -> Int
 
+pub fn rollout_buckets(String, Array[String]) -> Array[Int]
+
+pub fn rollout_matches(String, String, Int) -> Bool
+
+pub fn rollout_percentage_for(String, String) -> Int
+
+pub fn run_acceptance_scenario() -> ScenarioReport
+
 pub fn run_benchmark() -> String
+
+pub fn run_scenario_benchmark() -> BenchmarkReport
+
+pub fn scenario(String, Array[EvaluationRequest], Array[EvalContext]) -> EvaluationScenario
+
+pub fn snapshot(String, String, Provider) -> ProviderSnapshot
 
 pub fn string_value(String) -> FlagValue
 
@@ -44,11 +84,123 @@ pub(all) suberror ParseError {
 } derive(Eq, @debug.Debug)
 
 // Types and methods
+pub(all) struct AuditIssue {
+  key : String
+  code : String
+  severity : AuditSeverity
+  message : String
+} derive(Eq, @debug.Debug)
+
+pub(all) struct AuditReport {
+  total_flags : Int
+  errors : Int
+  warnings : Int
+  infos : Int
+  issues : Array[AuditIssue]
+} derive(@debug.Debug)
+pub fn AuditReport::has_warnings(Self) -> Bool
+pub fn AuditReport::is_clean(Self) -> Bool
+pub fn AuditReport::issue_count(Self, AuditSeverity) -> Int
+pub fn AuditReport::render(Self) -> String
+pub fn AuditReport::summary(Self) -> String
+
+pub(all) enum AuditSeverity {
+  Info
+  Warning
+  Error
+} derive(Eq, @debug.Debug)
+
+pub(all) struct BatchResult {
+  evaluations : Array[ValueEvaluation]
+  stats : BatchStats
+  reason_counts : Map[String, Int]
+} derive(@debug.Debug)
+pub fn BatchResult::has_failures(Self) -> Bool
+pub fn BatchResult::reason_count(Self, String) -> Int
+pub fn BatchResult::successful_ratio(Self) -> Double
+pub fn BatchResult::summary(Self) -> String
+
+pub(all) struct BatchStats {
+  mut total : Int
+  mut successes : Int
+  mut defaults : Int
+  mut disabled : Int
+  mut target_misses : Int
+  mut rollout_misses : Int
+  mut type_mismatches : Int
+} derive(Eq, @debug.Debug)
+
+pub(all) struct BenchmarkCase {
+  name : String
+  key : String
+  value : FlagValue
+  default_value : FlagValue
+  rollout_percentage : Int?
+  target_attr : String?
+  target_value : FlagValue?
+} derive(@debug.Debug)
+
+pub(all) struct BenchmarkReport {
+  scenarios : Int
+  rounds : Int
+  total_requests : Int
+  successful_evaluations : Int
+  defaulted_evaluations : Int
+  type_mismatches : Int
+  successful_ratio : Double
+} derive(Eq, @debug.Debug)
+
 pub(all) struct BoolEvaluation {
   flag_key : String
   value : Bool
   reason : String
 } derive(Eq, @debug.Debug)
+
+pub(all) enum CompatibilityLevel {
+  Identical
+  Additive
+  Changed
+  Breaking
+} derive(Eq, @debug.Debug)
+
+pub(all) struct CompatibilityReport {
+  level : CompatibilityLevel
+  diff : ProviderDiff
+  message : String
+} derive(@debug.Debug)
+pub fn CompatibilityReport::is_safe(Self) -> Bool
+pub fn CompatibilityReport::requires_replay(Self) -> Bool
+pub fn CompatibilityReport::summary(Self) -> String
+
+pub(all) struct DecisionLedger {
+  mut total : Int
+  mut matches : Int
+  mut defaults : Int
+  mut disabled : Int
+  mut target_misses : Int
+  mut rollout_misses : Int
+  mut type_mismatches : Int
+  mut reason_counts : Map[String, Int]
+} derive(@debug.Debug)
+pub fn DecisionLedger::count(Self, String) -> Int
+pub fn DecisionLedger::merge(Self, Self) -> Unit
+pub fn DecisionLedger::reason_report(Self) -> String
+pub fn DecisionLedger::record(Self, ValueEvaluation) -> Unit
+pub fn DecisionLedger::record_batch(Self, BatchResult) -> Unit
+pub fn DecisionLedger::reset(Self) -> Unit
+pub fn DecisionLedger::success_ratio(Self) -> Double
+pub fn DecisionLedger::summary(Self) -> String
+
+pub(all) struct DeploymentDecision {
+  allowed : Bool
+  health : ProviderHealth
+  compatibility : CompatibilityReport?
+  reason : String
+} derive(@debug.Debug)
+pub fn DeploymentDecision::health_status(Self) -> String
+pub fn DeploymentDecision::is_release_ready(Self) -> Bool
+pub fn DeploymentDecision::requires_manual_review(Self) -> Bool
+pub fn DeploymentDecision::summary(Self) -> String
 
 pub(all) struct DoubleEvaluation {
   flag_key : String
@@ -60,7 +212,25 @@ pub(all) struct EvalContext {
   targeting_key : String
   attributes : Map[String, FlagValue]
 } derive(@debug.Debug)
+pub fn EvalContext::attribute_count(Self) -> Int
+pub fn EvalContext::get_attr(Self, String) -> FlagValue?
+pub fn EvalContext::has_attr(Self, String) -> Bool
+pub fn EvalContext::merge(Self, Self) -> Self
 pub fn EvalContext::with_attr(Self, String, FlagValue) -> Self
+pub fn EvalContext::with_attrs(Self, Array[(String, FlagValue)]) -> Self
+pub fn EvalContext::with_targeting_key(Self, String) -> Self
+
+pub(all) struct EvaluationRequest {
+  key : String
+  default_value : FlagValue
+} derive(Eq, @debug.Debug)
+
+pub(all) struct EvaluationScenario {
+  name : String
+  requests : Array[EvaluationRequest]
+  contexts : Array[EvalContext]
+} derive(@debug.Debug)
+pub fn[P : FeatureProvider] EvaluationScenario::run(Self, P) -> ScenarioReport
 
 pub(all) struct FlagDefinition {
   key : String
@@ -70,6 +240,22 @@ pub(all) struct FlagDefinition {
   target_attr : String?
   target_value : FlagValue?
 } derive(@debug.Debug)
+pub fn FlagDefinition::has_target(Self) -> Bool
+pub fn FlagDefinition::is_rollout(Self) -> Bool
+pub fn FlagDefinition::usage(Self) -> FlagUsage
+pub fn FlagDefinition::validation_errors(Self) -> Array[String]
+pub fn FlagDefinition::value_kind(Self) -> String
+
+pub(all) struct FlagUsage {
+  key : String
+  kind : String
+  rule : String
+  enabled : Bool
+  rollout_percentage : Int?
+  target_attribute : String?
+} derive(Eq, @debug.Debug)
+pub fn FlagUsage::is_operational(Self) -> Bool
+pub fn FlagUsage::label(Self) -> String
 
 pub(all) enum FlagValue {
   BoolValue(Bool)
@@ -78,6 +264,12 @@ pub(all) enum FlagValue {
   DoubleValue(Double)
 } derive(Eq, @debug.Debug)
 pub fn FlagValue::to_text(Self) -> String
+
+pub(all) enum HealthStatus {
+  Healthy
+  Warning
+  Unhealthy
+} derive(Eq, @debug.Debug)
 
 pub(all) struct IntEvaluation {
   flag_key : String
@@ -90,12 +282,57 @@ pub struct JsonProvider {
 } derive(@debug.Debug)
 pub impl FeatureProvider for JsonProvider
 
+pub(all) struct PolicyReport {
+  provider_fingerprint : String
+  violations : Array[PolicyViolation]
+} derive(@debug.Debug)
+pub fn PolicyReport::is_compliant(Self) -> Bool
+pub fn PolicyReport::render(Self) -> String
+pub fn PolicyReport::summary(Self) -> String
+pub fn PolicyReport::violation_count(Self) -> Int
+
+pub(all) struct PolicyViolation {
+  key : String
+  code : String
+  message : String
+} derive(Eq, @debug.Debug)
+
 pub struct Provider {
   flags : Map[String, FlagDefinition]
 } derive(@debug.Debug)
+pub fn Provider::activate_if_compliant(Self, ProviderPolicy) -> Self?
+pub fn Provider::audit(Self) -> AuditReport
+pub fn Provider::check_policy(Self, ProviderPolicy) -> PolicyReport
+pub fn Provider::contains(Self, String) -> Bool
+pub fn Provider::count_value_kind(Self, String) -> Int
+pub fn Provider::definitions(Self) -> Array[FlagDefinition]
+pub fn Provider::describe(Self) -> String
+pub fn Provider::disabled_keys(Self) -> Array[String]
+pub fn Provider::enabled_keys(Self) -> Array[String]
+pub fn Provider::fingerprint(Self) -> String
+pub fn Provider::flag_keys(Self) -> Array[String]
+pub fn Provider::has_only_additions(Self, Self) -> Bool
+pub fn Provider::health_check(Self, ProviderPolicy) -> ProviderHealth
+pub fn Provider::inventory(Self) -> ProviderInventory
+pub fn Provider::is_safe(Self) -> Bool
+pub fn Provider::keys_with_prefix(Self, String) -> Array[String]
+pub fn Provider::merge(Self, Self) -> Self
+pub fn Provider::operational_flag_count(Self) -> Int
+pub fn Provider::overlay_if_safe(Self, Self) -> Self?
+pub fn Provider::remove(Self, String) -> Self
+pub fn Provider::render_usage(Self) -> String
+pub fn Provider::rollout_keys(Self) -> Array[String]
+pub fn Provider::same_configuration(Self, Self) -> Bool
+pub fn Provider::select(Self, Array[String]) -> Self
+pub fn Provider::static_keys(Self) -> Array[String]
+pub fn Provider::stats(Self) -> ProviderStats
+pub fn Provider::targeted_keys(Self) -> Array[String]
+pub fn Provider::to_dsl(Self) -> String
+pub fn Provider::usage(Self) -> Array[FlagUsage]
 pub fn Provider::with_bool(Self, String, Bool, enabled? : Bool) -> Self
 pub fn Provider::with_bool_rollout(Self, String, Bool, percentage~ : Int, enabled? : Bool) -> Self
 pub fn Provider::with_bool_target(Self, String, Bool, attr~ : String, equals~ : FlagValue, enabled? : Bool) -> Self
+pub fn Provider::with_definition(Self, FlagDefinition) -> Self
 pub fn Provider::with_double(Self, String, Double, enabled? : Bool) -> Self
 pub fn Provider::with_double_rollout(Self, String, Double, percentage~ : Int, enabled? : Bool) -> Self
 pub fn Provider::with_double_target(Self, String, Double, attr~ : String, equals~ : FlagValue, enabled? : Bool) -> Self
@@ -105,7 +342,120 @@ pub fn Provider::with_int_target(Self, String, Int, attr~ : String, equals~ : Fl
 pub fn Provider::with_string(Self, String, String, enabled? : Bool) -> Self
 pub fn Provider::with_string_rollout(Self, String, String, percentage~ : Int, enabled? : Bool) -> Self
 pub fn Provider::with_string_target(Self, String, String, attr~ : String, equals~ : FlagValue, enabled? : Bool) -> Self
+pub fn Provider::with_value(Self, String, FlagValue, enabled? : Bool) -> Self
+pub fn Provider::with_value_rollout(Self, String, FlagValue, percentage~ : Int, enabled? : Bool) -> Self
+pub fn Provider::with_value_target(Self, String, FlagValue, attr~ : String, equals~ : FlagValue, enabled? : Bool) -> Self
+pub fn Provider::without_disabled(Self) -> Self
 pub impl FeatureProvider for Provider
+
+pub(all) struct ProviderDiff {
+  added : Array[String]
+  removed : Array[String]
+  changed : Array[String]
+  unchanged : Array[String]
+} derive(Eq, @debug.Debug)
+pub fn ProviderDiff::is_compatible(Self) -> Bool
+pub fn ProviderDiff::summary(Self) -> String
+
+pub(all) struct ProviderHealth {
+  status : HealthStatus
+  audit : AuditReport
+  policy : PolicyReport
+  inventory : ProviderInventory
+  message : String
+} derive(@debug.Debug)
+pub fn ProviderHealth::has_warnings(Self) -> Bool
+pub fn ProviderHealth::is_ready(Self) -> Bool
+pub fn ProviderHealth::render(Self) -> String
+pub fn ProviderHealth::status_text(Self) -> String
+pub fn ProviderHealth::summary(Self) -> String
+
+pub(all) struct ProviderInventory {
+  total : Int
+  bool_flags : Int
+  string_flags : Int
+  int_flags : Int
+  double_flags : Int
+  static_flags : Int
+  rollout_flags : Int
+  targeted_flags : Int
+  enabled_flags : Int
+  disabled_flags : Int
+} derive(Eq, @debug.Debug)
+pub fn ProviderInventory::is_balanced(Self) -> Bool
+pub fn ProviderInventory::summary(Self) -> String
+
+pub(all) struct ProviderPolicy {
+  require_non_empty_keys : Bool
+  allow_disabled_flags : Bool
+  allow_zero_rollout : Bool
+  require_rollout_key_prefix : String?
+  max_rollout_percentage : Int
+} derive(Eq, @debug.Debug)
+pub fn ProviderPolicy::for_tests() -> Self
+pub fn ProviderPolicy::production() -> Self
+
+pub(all) struct ProviderRegistry {
+  snapshots : Map[String, ProviderSnapshot]
+  active_name : String?
+} derive(@debug.Debug)
+pub fn ProviderRegistry::activate(Self, String) -> Self?
+pub fn ProviderRegistry::active(Self) -> ProviderSnapshot?
+pub fn ProviderRegistry::active_provider(Self) -> Provider?
+pub fn ProviderRegistry::contains(Self, String) -> Bool
+pub fn ProviderRegistry::get(Self, String) -> ProviderSnapshot?
+pub fn ProviderRegistry::names(Self) -> Array[String]
+pub fn ProviderRegistry::register(Self, ProviderSnapshot) -> Self
+pub fn ProviderRegistry::remove(Self, String) -> Self
+pub fn ProviderRegistry::summary(Self) -> String
+
+pub(all) struct ProviderSnapshot {
+  name : String
+  version : String
+  provider : Provider
+  fingerprint : String
+  audited : Bool
+} derive(@debug.Debug)
+
+pub(all) struct ProviderStats {
+  mut total : Int
+  mut enabled : Int
+  mut disabled : Int
+  mut rollout : Int
+  mut targeted : Int
+  mut bool_count : Int
+  mut string_count : Int
+  mut int_count : Int
+  mut double_count : Int
+} derive(Eq, @debug.Debug)
+
+pub(all) struct RolloutDistribution {
+  samples : Int
+  matched : Int
+  requested_percentage : Int
+  observed_percentage : Double
+  min_bucket : Int
+  max_bucket : Int
+} derive(Eq, @debug.Debug)
+pub fn RolloutDistribution::summary(Self) -> String
+pub fn RolloutDistribution::within_tolerance(Self, Double) -> Bool
+
+pub(all) struct ScenarioReport {
+  name : String
+  contexts : Int
+  requests_per_context : Int
+  total : Int
+  matches : Int
+  defaults : Int
+  disabled : Int
+  target_misses : Int
+  rollout_misses : Int
+  type_mismatches : Int
+  ledger : DecisionLedger
+} derive(@debug.Debug)
+pub fn ScenarioReport::is_reproducible(Self) -> Bool
+pub fn ScenarioReport::success_ratio(Self) -> Double
+pub fn ScenarioReport::summary(Self) -> String
 
 pub(all) struct StringEvaluation {
   flag_key : String
@@ -118,6 +468,8 @@ pub(all) struct ValueEvaluation {
   value : FlagValue
   reason : String
 } derive(Eq, @debug.Debug)
+pub fn ValueEvaluation::is_match(Self) -> Bool
+pub fn ValueEvaluation::uses_default(Self) -> Bool
 
 // Type aliases
 
