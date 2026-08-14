@@ -33,8 +33,11 @@ benchmark line.
 - History: existing public history has meaningful development commits; do not
   add empty or artificial split-only commits.
 - CI: `.github/workflows/ci.yml` covers Linux, macOS and Windows.
-- Scope: non-test MoonBit source is above 3,000 lines and is organized into
-  evaluator, provider, parser, audit, policy, scenario, and deployment layers.
+- Scope: non-test MoonBit source is approximately 4,000 lines and is organized
+  into evaluator, provider, parser, audit, policy, scenario, deployment,
+  release-planning, and exposure-analysis layers.
+- Operations: `release.mbt` produces a reviewable release/rollback plan;
+  `exposure.mbt` produces typed exposure counters and release gates.
 
 ## Boundary coverage
 
@@ -53,7 +56,8 @@ benchmark line.
 ## Publication metadata
 
 - Module: `wccerty/moonfeaturegate`.
-- Version: `0.1.2`.
+- Version: `0.1.3` (the 0.1.2 package remains available on Mooncakes until
+  the post-CI publication step).
 - Repository URL in `moon.mod` points to GitHub.
 - GitHub and GitLink are synchronized from the same creator-authored commit.
 - Mooncakes publication must use the authenticated `wccerty` account.

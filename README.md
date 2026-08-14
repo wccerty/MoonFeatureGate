@@ -2,7 +2,7 @@
 
 MoonFeatureGate 是一个 MoonBit 原生的功能开关与渐进式发布工具库。它在本地完成类型安全的旗标评估、用户定向、稳定百分比 rollout 和决策原因解释，不依赖远程控制平面，适合库、服务、WASM 应用和教学示例。
 
-当前版本：**0.1.2**。本项目面向 2026 MoonBit 国产开源生态大赛的工程基础设施方向，重点是可复用、可审计、可测试的本地功能发布能力。
+当前版本：**0.1.3**。本项目面向 2026 MoonBit 国产开源生态大赛的工程基础设施方向，重点是可复用、可审计、可测试的本地功能发布能力。
 
 ## 功能范围
 
@@ -88,7 +88,7 @@ let detail = @moonfeaturegate.evaluate_bool(
 println(detail.reason)
 ```
 
-如果目标环境需要固定版本，请在 `moon.mod` 中确认依赖解析到 `0.1.2`，并将 `moon.lock`（若项目生成该文件）纳入版本控制。
+如果目标环境需要固定版本，请在 `moon.mod` 中确认依赖解析到 `0.1.3`，并将 `moon.lock`（若项目生成该文件）纳入版本控制。
 
 ## JSON 配置
 
@@ -156,11 +156,13 @@ println(result.summary())
 
 - 根包的 `*.mbt`：provider、上下文、值类型、评估器、JSON/文本解析器和 benchmark。
 - `*_test.mbt` / `*_wbtest.mbt`：黑盒和白盒测试，覆盖正常路径与边界条件。
-- `cmd/moonfeaturegate`：使用 `pkgtype(kind: "executable")` 声明的 CLI 包。
+- `cmd/moonfeaturegate`：使用 `options("is-main": true)` 声明的 CLI 包。
 - `examples/flags.mfg`：可读的 DSL 配置样例。
 - `docs/design.md`：评估顺序和扩展边界。
 - `benchmark_cases.mbt` / `scenario.mbt`：真实业务形态基准数据和验收矩阵。
 - `audit.mbt` / `policy.mbt` / `deployment.mbt`：配置审计、发布策略和部署前检查。
+- `release.mbt`：把健康检查、兼容性和审批信息组合为可审计的发布计划。
+- `exposure.mbt`：统计请求上下文中的命中、默认值、目标不匹配和灰度分布。
 - `docs/acceptance-checklist.md`：可重复的验收命令与仓库检查项。
 - `.github/workflows/ci.yml`：Linux、macOS、Windows 的格式、检查、测试和 coverage 工作流。
 
@@ -178,7 +180,9 @@ moon coverage report -f summary
 moon coverage analyze
 ```
 
-官方社区 CI 模板还要求检查所有目标；本仓库的 CI 在三平台执行常规测试，并额外覆盖 `wasm-gc` 和 native 路径。
+官方社区 CI 模板还要求检查所有目标；本仓库的 CI 在三平台执行格式检查、所有目标检查、测试、覆盖率和 native 路径，并在安装后显式验证 `moon` 可执行文件。
+
+当前工程规模约为 4k 行非测试 MoonBit 源码，新增发布计划和暴露分析模块均服务于实际的配置发布、灰度观察和回滚审计流程。
 
 ## 开源与项目链接
 

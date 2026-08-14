@@ -32,7 +32,8 @@ Date: 2026-08-12
 - Added audit, production policy, health, registry, scenario replay, and pure
   deployment preflight APIs.
 - Added 12 realistic synthetic benchmark cases, a four-context acceptance
-  matrix, and 45 executable tests. Non-test MoonBit source is above 3,000 lines.
+  matrix, release planning, exposure analysis, and 53 executable tests.
+  Non-test MoonBit source is approximately 4,000 lines.
 
 ## Verification commands
 
@@ -51,7 +52,8 @@ moon run cmd/moonfeaturegate
 
 ## Publication
 
-- Mooncakes module: `wccerty/moonfeaturegate@0.1.2`
+- Mooncakes module: `wccerty/moonfeaturegate@0.1.2`; the source-compatible 0.1.3
+  update must be published after CI verification.
 - Publication identity: authenticated GitHub-linked Mooncakes account `wccerty`.
 - GitHub and GitLink changes must be pushed from the creator-authored commit.
 

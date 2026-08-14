@@ -8,6 +8,8 @@ import {
 // Values
 pub fn acceptance_scenario() -> EvaluationScenario
 
+pub fn analyze_exposure(Provider, Array[ExposureRequest], Array[EvalContext]) -> ExposureReport
+
 pub fn benchmark_cases() -> Array[BenchmarkCase]
 
 pub fn bool_value(Bool) -> FlagValue
@@ -44,6 +46,8 @@ pub fn[P : FeatureProvider] evaluate_value(P, String, EvalContext, default~ : Fl
 
 pub fn[P : FeatureProvider] evaluate_with_ledger(P, Array[EvaluationRequest], EvalContext, DecisionLedger) -> BatchResult
 
+pub fn exposure_request(String, FlagValue) -> ExposureRequest
+
 pub fn int_value(Int) -> FlagValue
 
 pub fn measure_rollout(String, Array[String], Int) -> RolloutDistribution
@@ -55,6 +59,12 @@ pub fn new_registry() -> ProviderRegistry
 pub fn parse_json_provider(String) -> JsonProvider?
 
 pub fn parse_provider(String) -> Provider raise ParseError
+
+pub fn permissive_exposure_threshold() -> ExposureThreshold
+
+pub fn plan_release(Provider?, Provider, environment~ : ReleaseEnvironment, policy~ : ProviderPolicy, owner~ : String, change_ticket~ : String) -> ReleasePlan
+
+pub fn release_metadata(String, String, ReleaseEnvironment) -> ReleaseMetadata
 
 pub fn request(String, FlagValue) -> EvaluationRequest
 
@@ -71,6 +81,8 @@ pub fn run_acceptance_scenario() -> ScenarioReport
 pub fn run_benchmark() -> String
 
 pub fn run_scenario_benchmark() -> BenchmarkReport
+
+pub fn safe_exposure_threshold() -> ExposureThreshold
 
 pub fn scenario(String, Array[EvaluationRequest], Array[EvalContext]) -> EvaluationScenario
 
@@ -231,6 +243,90 @@ pub(all) struct EvaluationScenario {
   contexts : Array[EvalContext]
 } derive(@debug.Debug)
 pub fn[P : FeatureProvider] EvaluationScenario::run(Self, P) -> ScenarioReport
+
+pub(all) struct ExposureAssessment {
+  passed : Bool
+  default_ratio : Double
+  anomalous_rows : Array[String]
+  inconsistent_rows : Array[String]
+  message : String
+} derive(@debug.Debug)
+pub fn ExposureAssessment::is_actionable(Self) -> Bool
+pub fn ExposureAssessment::summary(Self) -> String
+
+pub(all) struct ExposureReport {
+  rows : Map[String, ExposureRow]
+  samples : Int
+  requests : Int
+} derive(@debug.Debug)
+pub fn ExposureReport::assess(Self, ExposureThreshold) -> ExposureAssessment
+pub fn ExposureReport::compact_signature(Self) -> String
+pub fn ExposureReport::coverage_percent(Self) -> Double
+pub fn ExposureReport::default_count(Self) -> Int
+pub fn ExposureReport::default_ratio(Self) -> Double
+pub fn ExposureReport::difference(Self, Self) -> Array[String]
+pub fn ExposureReport::empty() -> Self
+pub fn ExposureReport::empty_rows(Self) -> Array[String]
+pub fn ExposureReport::evaluation_count(Self) -> Int
+pub fn ExposureReport::has_anomalies(Self) -> Bool
+pub fn ExposureReport::has_requested_key(Self, String) -> Bool
+pub fn ExposureReport::healthy_for_release(Self) -> Bool
+pub fn ExposureReport::inconsistent_rows(Self) -> Array[String]
+pub fn ExposureReport::is_representative(Self, minimum~ : Int) -> Bool
+pub fn ExposureReport::keys(Self) -> Array[String]
+pub fn ExposureReport::kind_summary(Self) -> String
+pub fn ExposureReport::match_count(Self) -> Int
+pub fn ExposureReport::merge(Self, Self) -> Self
+pub fn ExposureReport::passes(Self, ExposureThreshold) -> Bool
+pub fn ExposureReport::quality_score(Self) -> Int
+pub fn ExposureReport::reason_totals(Self) -> Map[String, Int]
+pub fn ExposureReport::recommendation(Self) -> String
+pub fn ExposureReport::render(Self) -> String
+pub fn ExposureReport::request_count(Self) -> Int
+pub fn ExposureReport::rollout_match_ratio(Self) -> Double
+pub fn ExposureReport::rollout_rows(Self) -> Array[ExposureRow]
+pub fn ExposureReport::row(Self, String) -> ExposureRow?
+pub fn ExposureReport::rows_for_prefix(Self, String) -> Array[ExposureRow]
+pub fn ExposureReport::rows_with_defaults(Self) -> Array[String]
+pub fn ExposureReport::rows_with_target_misses(Self) -> Array[String]
+pub fn ExposureReport::rows_with_type_mismatches(Self) -> Array[String]
+pub fn ExposureReport::same_shape(Self, Self) -> Bool
+pub fn ExposureReport::sample_count(Self) -> Int
+pub fn ExposureReport::targeting_miss_rate(Self) -> Double
+
+pub(all) struct ExposureRequest {
+  key : String
+  default_value : FlagValue
+} derive(Eq, @debug.Debug)
+pub fn ExposureRequest::default_kind(Self) -> String
+pub fn ExposureRequest::key(Self) -> String
+
+pub(all) struct ExposureRow {
+  key : String
+  kind : String
+  samples : Int
+  matches : Int
+  defaults : Int
+  target_misses : Int
+  rollout_matches : Int
+  rollout_misses : Int
+  type_mismatches : Int
+  disabled : Int
+  static_matches : Int
+} derive(Eq, @debug.Debug)
+pub fn ExposureRow::default_ratio(Self) -> Double
+pub fn ExposureRow::has_default_path(Self) -> Bool
+pub fn ExposureRow::has_target_misses(Self) -> Bool
+pub fn ExposureRow::is_consistent(Self) -> Bool
+pub fn ExposureRow::matched_ratio(Self) -> Double
+pub fn ExposureRow::reason_count(Self, String) -> Int
+pub fn ExposureRow::summary(Self) -> String
+
+pub(all) struct ExposureThreshold {
+  max_default_ratio : Double
+  reject_target_misses : Bool
+  reject_type_mismatches : Bool
+} derive(Eq, @debug.Debug)
 
 pub(all) struct FlagDefinition {
   key : String
@@ -428,6 +524,90 @@ pub(all) struct ProviderStats {
   mut int_count : Int
   mut double_count : Int
 } derive(Eq, @debug.Debug)
+
+pub(all) enum ReleaseApproval {
+  Pending
+  Approved(reviewer~ : String)
+  Rejected(reviewer~ : String, reason~ : String)
+} derive(Eq, @debug.Debug)
+pub fn ReleaseApproval::is_approved(Self) -> Bool
+pub fn ReleaseApproval::label(Self) -> String
+
+pub(all) struct ReleaseChange {
+  key : String
+  kind : String
+  risk : ReleaseRisk
+  message : String
+} derive(Eq, @debug.Debug)
+pub fn ReleaseChange::summary(Self) -> String
+
+pub(all) enum ReleaseEnvironment {
+  Development
+  Staging
+  Canary
+  Production
+} derive(Eq, @debug.Debug)
+pub fn ReleaseEnvironment::maximum_risk(Self) -> ReleaseRisk
+pub fn ReleaseEnvironment::name(Self) -> String
+pub fn ReleaseEnvironment::requires_approval(Self) -> Bool
+
+pub(all) struct ReleaseMetadata {
+  owner : String
+  change_ticket : String
+  environment : ReleaseEnvironment
+} derive(Eq, @debug.Debug)
+pub fn ReleaseMetadata::errors(Self) -> Array[String]
+
+pub(all) struct ReleasePlan {
+  metadata : ReleaseMetadata
+  next : Provider
+  previous : Provider?
+  health : ProviderHealth
+  compatibility : CompatibilityReport?
+  changes : Array[ReleaseChange]
+  risk : ReleaseRisk
+  approval : ReleaseApproval
+  allowed : Bool
+} derive(@debug.Debug)
+pub fn ReleasePlan::approval_label(Self) -> String
+pub fn ReleasePlan::approval_steps(Self) -> Array[String]
+pub fn ReleasePlan::approve(Self, String) -> Self
+pub fn ReleasePlan::audit_ready(Self) -> Bool
+pub fn ReleasePlan::change_count(Self) -> Int
+pub fn ReleasePlan::change_summary(Self) -> String
+pub fn ReleasePlan::changed_keys(Self) -> Array[String]
+pub fn ReleasePlan::changes(Self) -> Array[ReleaseChange]
+pub fn ReleasePlan::decision(Self) -> DeploymentDecision
+pub fn ReleasePlan::environment(Self) -> ReleaseEnvironment
+pub fn ReleasePlan::guardrails(Self) -> Array[String]
+pub fn ReleasePlan::has_breaking_change(Self) -> Bool
+pub fn ReleasePlan::is_approved(Self) -> Bool
+pub fn ReleasePlan::is_release_ready(Self) -> Bool
+pub fn ReleasePlan::metadata_errors(Self) -> Array[String]
+pub fn ReleasePlan::operator_notes(Self) -> Array[String]
+pub fn ReleasePlan::provider_fingerprint(Self) -> String
+pub fn ReleasePlan::reject(Self, String, String) -> Self
+pub fn ReleasePlan::render(Self) -> String
+pub fn ReleasePlan::replay_required(Self) -> Bool
+pub fn ReleasePlan::requires_manual_approval(Self) -> Bool
+pub fn ReleasePlan::reviewer_required(Self) -> Bool
+pub fn ReleasePlan::risk(Self) -> ReleaseRisk
+pub fn ReleasePlan::risk_explanation(Self) -> String
+pub fn ReleasePlan::risk_score(Self) -> Int
+pub fn ReleasePlan::rollback(Self) -> Array[String]
+pub fn ReleasePlan::rollback_fingerprint(Self) -> String?
+pub fn ReleasePlan::stage(Self) -> String
+pub fn ReleasePlan::summary(Self) -> String
+
+pub(all) enum ReleaseRisk {
+  Low
+  Medium
+  High
+  Critical
+} derive(Eq, @debug.Debug)
+pub fn ReleaseRisk::at_least(Self, Self) -> Bool
+pub fn ReleaseRisk::name(Self) -> String
+pub fn ReleaseRisk::rank(Self) -> Int
 
 pub(all) struct RolloutDistribution {
   samples : Int

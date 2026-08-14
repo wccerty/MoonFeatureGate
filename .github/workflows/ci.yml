@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           persist-credentials: false
 
@@ -31,14 +31,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gcc libssl-dev
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          export PATH="$HOME/.moon/bin:$PATH"
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+          command -v moon
 
       - name: Setup Moon env (macOS)
         if: runner.os == 'macOS'
         run: |
           brew install gcc openssl
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          export PATH="$HOME/.moon/bin:$PATH"
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+          command -v moon
 
       - name: Setup Moon env (Windows)
         if: runner.os == 'Windows'
@@ -46,7 +50,10 @@ jobs:
         run: |
           Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
           irm https://cli.moonbitlang.com/install/powershell.ps1 | iex
-          echo "$HOME/.moon/bin" | Out-File -FilePath $env:GITHUB_PATH -Append
+          $moonBin = Join-Path $HOME ".moon\bin"
+          $moonBin | Out-File -FilePath $env:GITHUB_PATH -Append
+          $env:Path = "$moonBin;$env:Path"
+          & (Join-Path $moonBin "moon.exe") version --all
 
       - name: Setup MSYS2 + MinGW + openssl (Windows)
         if: runner.os == 'Windows'
@@ -61,13 +68,12 @@ jobs:
       - name: Moon Check
         run: |
           moon version --all
-          moon update
           moon fmt --check
           moon check --deny-warn
           moon check --deny-warn --target all
           moon info
           git diff --exit-code
-          git status
+          git status --short
 
       - name: Moon test
         run: |

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.3 - 2026-08-15
+
+- Added typed release planning with risk classification, approval state,
+  compatibility replay requirements, rollback steps, and operator guardrails.
+- Added exposure analysis for typed requests and contexts, including fallback,
+  targeting, rollout, consistency, threshold, and canary-quality reports.
+- Updated CI executable-path checks and removed an unnecessary dependency update
+  step so the standard MoonBit checks are more reproducible on all runners.
+- Corrected README package syntax and synchronized acceptance documentation with
+  the measured non-test MoonBit source.
+- Expanded the executable acceptance suite to 53 tests.
+
 ## 0.1.2 - 2026-08-12
 
 - Added immutable context helpers, batch evaluation, reason aggregation, and a
@@ -14,7 +26,7 @@
   safety, caching, search, mobile, workers, observability, media, and
   maintenance use cases.
 - Expanded the test suite to 45 passing tests and raised non-test MoonBit source
-  size above 3,000 lines.
+  size above 3,000 lines in the 0.1.2 baseline.
 
 ## 0.1.1 - 2026-08-07
 
