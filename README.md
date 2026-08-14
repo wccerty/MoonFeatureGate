@@ -63,7 +63,7 @@ Windows PowerShell 可使用完全相同的 `moon` 命令。`moon run` 的预期
 在目标项目的模块根目录执行：
 
 ```bash
-moon add wccerty/moonfeaturegate
+moon add wccerty/moonfeaturegate@0.1.3
 moon update
 ```
 
@@ -88,7 +88,7 @@ let detail = @moonfeaturegate.evaluate_bool(
 println(detail.reason)
 ```
 
-如果目标环境需要固定版本，请在 `moon.mod` 中确认依赖解析到 `0.1.3`，并将 `moon.lock`（若项目生成该文件）纳入版本控制。
+上面的版本号用于稳定复现本次验收版本；如果目标环境需要升级，建议显式执行 `moon add -u wccerty/moonfeaturegate`，并将变更后的 `moon.mod` / `moon.lock`（若项目生成该文件）纳入版本控制。
 
 ## JSON 配置
 

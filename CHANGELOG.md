@@ -11,6 +11,8 @@
 - Corrected README package syntax and synchronized acceptance documentation with
   the measured non-test MoonBit source.
 - Expanded the executable acceptance suite to 53 tests.
+- Pinned the README installation example to `wccerty/moonfeaturegate@0.1.3`
+  for deterministic dependency reproduction.
 
 ## 0.1.2 - 2026-08-12
 

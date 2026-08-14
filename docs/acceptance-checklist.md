@@ -27,8 +27,8 @@ benchmark line.
 - GitHub: `https://github.com/wccerty/MoonFeatureGate`
 - GitLink: `https://gitlink.org.cn/Wccerty/MoonFeatureGate`
 - License: Apache-2.0, stored as a regular `LICENSE` file.
-- README: regular UTF-8 file with installation, `moon add`, CLI, JSON, DSL and
-  verification instructions.
+- README: regular UTF-8 file with installation, pinned `moon add
+  wccerty/moonfeaturegate@0.1.3`, CLI, JSON, DSL and verification instructions.
 - Public MoonBit API: generated `pkg.generated.mbti` is checked by `moon info`.
 - History: existing public history has meaningful development commits; do not
   add empty or artificial split-only commits.
@@ -56,8 +56,7 @@ benchmark line.
 ## Publication metadata
 
 - Module: `wccerty/moonfeaturegate`.
-- Version: `0.1.3` (the 0.1.2 package remains available on Mooncakes until
-  the post-CI publication step).
+- Version: `0.1.3`, published as `wccerty/moonfeaturegate@0.1.3` on Mooncakes.
 - Repository URL in `moon.mod` points to GitHub.
 - GitHub and GitLink are synchronized from the same creator-authored commit.
 - Mooncakes publication must use the authenticated `wccerty` account.

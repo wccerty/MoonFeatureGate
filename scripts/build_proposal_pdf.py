@@ -58,7 +58,7 @@ def main() -> None:
     p = lambda text, style: Paragraph(text, style)
     story = [
         p("MoonFeatureGate：MoonBit 原生功能开关与灰度发布工具库", title),
-        p("申报人：魏承昌（Wccerty）｜版本：0.1.2｜方向：工程基础设施与工具链。"
+        p("申报人：魏承昌（Wccerty）｜版本：0.1.3｜方向：工程基础设施与工具链。"
           "GitHub：github.com/wccerty/MoonFeatureGate；GitLink：gitlink.org.cn/Wccerty/MoonFeatureGate。", subtitle),
         p("项目简介", heading),
         p("MoonFeatureGate 面向 MoonBit 生态提供本地功能开关、用户定向、稳定百分比 rollout、"
@@ -66,12 +66,12 @@ def main() -> None:
         p("核心能力", heading),
     ]
     data = [
-        [p("模块", small), p("0.1.2 交付内容", small)],
+        [p("模块", small), p("0.1.3 交付内容", small)],
         [p("类型安全", small), p("支持 Bool、String、Int、Double 四类 FlagValue 和类型匹配检查。", small)],
         [p("Provider", small), p("支持 FeatureProvider、JSON provider、多类型 DSL、merge、diff、fingerprint 和 inventory。", small)],
-        [p("治理能力", small), p("支持审计、生产策略、健康检查、配置 registry、兼容性判定和纯函数部署预检。", small)],
-        [p("评估能力", small), p("支持静态、disabled、target、rollout、多请求批量评估和隐私友好的 DecisionLedger。", small)],
-        [p("工程证据", small), p("12 个真实业务形态基准场景、4-context 验收矩阵、45 项测试、跨平台 CI，非测试源码超过 3,000 行。", small)],
+        [p("治理能力", small), p("支持审计、生产策略、健康检查、配置 registry、兼容性判定、发布风险计划和纯函数部署预检。", small)],
+        [p("评估能力", small), p("支持静态、disabled、target、rollout、多请求批量评估、暴露分析和隐私友好的 DecisionLedger。", small)],
+        [p("工程证据", small), p("12 个真实业务形态基准场景、4-context 验收矩阵、53 项测试、跨平台 CI，非测试源码约 4,000 行。", small)],
     ]
     table = Table(data, colWidths=[32 * mm, 124 * mm])
     table.setStyle(TableStyle([

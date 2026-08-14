@@ -52,8 +52,9 @@ moon run cmd/moonfeaturegate
 
 ## Publication
 
-- Mooncakes module: `wccerty/moonfeaturegate@0.1.2`; the source-compatible 0.1.3
-  update must be published after CI verification.
+- Mooncakes module: `wccerty/moonfeaturegate@0.1.3`.
+- CI verification completed successfully on Linux, macOS, and Windows before
+  publication.
 - Publication identity: authenticated GitHub-linked Mooncakes account `wccerty`.
 - GitHub and GitLink changes must be pushed from the creator-authored commit.
 
